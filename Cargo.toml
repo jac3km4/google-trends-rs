@@ -1,0 +1,15 @@
+[package]
+name = "google-trends"
+version = "0.1.0"
+authors = ["jac3km4 <jac3km4@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+reqwest =  { version = "0.10", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = { version = "1.0" }
+serde_json = { version = "1.0" }
+chrono = { version = "0.4" }
