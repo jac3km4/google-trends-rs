@@ -181,6 +181,7 @@ impl Serialize for Timeframe {
 #[serde(rename_all = "camelCase")]
 pub struct RegionEntry {
     pub coordinates: Option<Coordinates>,
+    pub geo_code: String,
     pub geo_name: String,
     pub value: Vec<u8>,
     pub has_data: Vec<bool>,
