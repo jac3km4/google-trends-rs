@@ -180,38 +180,38 @@ impl Serialize for Timeframe {
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RegionEntry {
-    coordinates: Coordinates,
-    geo_name: String,
-    value: Vec<u8>,
-    has_data: Vec<bool>,
+    pub coordinates: Coordinates,
+    pub geo_name: String,
+    pub value: Vec<u8>,
+    pub has_data: Vec<bool>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Coordinates {
-    lat: f64,
-    lng: f64,
+    pub lat: f64,
+    pub lng: f64,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TimeSeriesEntry {
     #[serde(with = "trends_time_format")]
-    time: DateTime<chrono::offset::Utc>,
-    formatted_time: String,
-    value: Vec<u8>,
-    has_data: Vec<bool>,
+    pub time: DateTime<chrono::offset::Utc>,
+    pub formatted_time: String,
+    pub value: Vec<u8>,
+    pub has_data: Vec<bool>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct RegionData {
     #[serde(rename = "geoMapData")]
-    entries: Vec<RegionEntry>,
+    pub entries: Vec<RegionEntry>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct TimeSeriesData {
     #[serde(rename = "timelineData")]
-    entries: Vec<TimeSeriesEntry>,
+    pub entries: Vec<TimeSeriesEntry>,
 }
 
 mod trends_time_format {
