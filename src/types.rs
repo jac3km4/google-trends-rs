@@ -180,7 +180,7 @@ impl Serialize for Timeframe {
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RegionEntry {
-    pub coordinates: Coordinates,
+    pub coordinates: Option<Coordinates>,
     pub geo_name: String,
     pub value: Vec<u8>,
     pub has_data: Vec<bool>,
