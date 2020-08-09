@@ -33,6 +33,11 @@ impl RequestParameters {
         self.request["requestOptions"]["category"] = serde_json::to_value(category)?;
         Ok(())
     }
+
+    fn include_low_volume_geos(&mut self, include: bool) -> Result<(), serde_json::Error> {
+        self.request["includeLowSearchVolumeGeos"] = serde_json::to_value(include)?;
+        Ok(())
+    }
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -99,12 +104,14 @@ impl TrendsClient {
         resolution: Resolution,
         source: Source,
         category: Category,
+        include_low_volume_regions: bool,
     ) -> Result<RegionData, Error> {
         let search = SearchType::Region;
         let mut item = self.explore(query, search).await?;
         item.resolution(resolution)?;
         item.source(source)?;
         item.category(category)?;
+        item.include_low_volume_geos(include_low_volume_regions)?;
 
         let resp: GeoDataResponse = self.query(&item, search).await?;
         Ok(resp.default)
