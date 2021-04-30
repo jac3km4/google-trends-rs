@@ -154,7 +154,9 @@ impl TrendsClient {
     }
 
     async fn run_with_retry(&self, req: Request) -> Result<Response, Error> {
-        let mut req_copy = req.try_clone().unwrap();
+        let mut req_copy = Request::new(req.method().clone(), req.url().clone());
+        *req_copy.headers_mut() = req.headers().clone();
+
         let resp = self.client.execute(req).await?;
         match resp.status() {
             StatusCode::TOO_MANY_REQUESTS => {
