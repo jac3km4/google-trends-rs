@@ -83,9 +83,9 @@ impl TrendsClient {
         }
     }
 
-    pub async fn interest_by_time<'a>(
+    pub async fn interest_by_time(
         &self,
-        query: &Query<'a>,
+        query: &Query<'_>,
         source: Source,
         category: Category,
     ) -> Result<TimeSeriesData, Error> {
@@ -98,9 +98,9 @@ impl TrendsClient {
         Ok(resp.default)
     }
 
-    pub async fn interest_by_region<'a>(
+    pub async fn interest_by_region(
         &self,
-        query: &Query<'a>,
+        query: &Query<'_>,
         resolution: Resolution,
         source: Source,
         category: Category,
@@ -133,7 +133,7 @@ impl TrendsClient {
         Ok(serde_json::from_str(&body[5..])?)
     }
 
-    async fn explore<'a>(&self, query: &Query<'a>, search: SearchType) -> Result<RequestParameters, Error> {
+    async fn explore(&self, query: &Query<'_>, search: SearchType) -> Result<RequestParameters, Error> {
         let req = self
             .client
             .request(Method::GET, "https://trends.google.com/trends/api/explore")
@@ -149,7 +149,7 @@ impl TrendsClient {
 
         let item = resp
             .get_request(search)
-            .ok_or(Error::UnexpectedResponse("Search feature unavailable".to_owned()))?;
+            .ok_or_else(|| Error::UnexpectedResponse("Search feature unavailable".to_owned()))?;
         Ok(item.clone())
     }
 
@@ -160,14 +160,15 @@ impl TrendsClient {
         let resp = self.client.execute(req).await?;
         match resp.status() {
             StatusCode::TOO_MANY_REQUESTS => {
-                resp.headers()
+                if let Some(val) = resp
+                    .headers()
                     .get("set-cookie")
                     .and_then(|val| val.to_str().ok())
-                    .and_then(|str| str.split(";").nth(0))
-                    .map(|val| {
-                        let header = HeaderValue::from_str(val).unwrap();
-                        req_copy.headers_mut().insert("cookie", header);
-                    });
+                    .and_then(|str| str.split(';').next())
+                {
+                    let header = HeaderValue::from_str(val).unwrap();
+                    req_copy.headers_mut().insert("cookie", header);
+                }
                 Ok(self.client.execute(req_copy).await?)
             }
             StatusCode::OK => Ok(resp),

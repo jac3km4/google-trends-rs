@@ -240,7 +240,7 @@ mod trends_time_format {
         D::Error: serde::de::Error,
     {
         let str = String::deserialize(deserializer)?;
-        let secs: i64 = str.parse().map_err(|e| D::Error::custom(e))?;
+        let secs: i64 = str.parse().map_err(D::Error::custom)?;
         let ndt = chrono::NaiveDateTime::from_timestamp(secs, 0);
         Ok(chrono::DateTime::from_utc(ndt, chrono::offset::Utc))
     }
