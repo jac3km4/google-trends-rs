@@ -83,9 +83,9 @@ impl TrendsClient {
         }
     }
 
-    pub async fn interest_by_time(
+    pub async fn interest_by_time<'a>(
         &self,
-        query: &Query,
+        query: &Query<'a>,
         source: Source,
         category: Category,
     ) -> Result<TimeSeriesData, Error> {
@@ -98,9 +98,9 @@ impl TrendsClient {
         Ok(resp.default)
     }
 
-    pub async fn interest_by_region(
+    pub async fn interest_by_region<'a>(
         &self,
-        query: &Query,
+        query: &Query<'a>,
         resolution: Resolution,
         source: Source,
         category: Category,
@@ -133,7 +133,7 @@ impl TrendsClient {
         Ok(serde_json::from_str(&body[5..])?)
     }
 
-    async fn explore(&self, query: &Query, search: SearchType) -> Result<RequestParameters, Error> {
+    async fn explore<'a>(&self, query: &Query<'a>, search: SearchType) -> Result<RequestParameters, Error> {
         let req = self
             .client
             .request(Method::GET, "https://trends.google.com/trends/api/explore")

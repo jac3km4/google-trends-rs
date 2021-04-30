@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use chrono::{Date, DateTime, TimeZone};
 use serde::{Deserialize, Serialize, Serializer};
 
@@ -107,13 +109,13 @@ pub enum SearchType {
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Query {
-    comparison_item: Vec<QueryItem>,
+pub struct Query<'a> {
+    comparison_item: Vec<QueryItem<'a>>,
     category: Category,
     property: Source,
 }
 
-impl Query {
+impl<'a> Query<'a> {
     pub fn new(items: Vec<QueryItem>) -> Query {
         Query {
             comparison_item: items,
@@ -122,33 +124,41 @@ impl Query {
         }
     }
 
-    pub fn by_keyword(keyword: String, time: Timeframe) -> Query {
-        Query::new(vec![QueryItem::keyword(keyword, time)])
+    pub fn by_keyword(keyword: String, time: Timeframe) -> Self {
+        Query::new(vec![QueryItem::by_keyword(keyword, time)])
+    }
+
+    pub fn items(&self) -> &[QueryItem] {
+        &self.comparison_item
     }
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct QueryItem {
-    keyword: String,
-    geo: Option<String>,
+pub struct QueryItem<'a> {
+    keyword: Cow<'a, str>,
+    geo: Option<Cow<'a, str>>,
     time: Timeframe,
 }
 
-impl QueryItem {
-    pub fn keyword(keyword: String, time: Timeframe) -> QueryItem {
+impl<'a> QueryItem<'a> {
+    pub fn by_keyword<S: Into<Cow<'a, str>>>(keyword: S, time: Timeframe) -> Self {
         QueryItem {
-            keyword,
+            keyword: keyword.into(),
             geo: None,
             time,
         }
     }
 
-    pub fn keyword_with_geo(keyword: String, region: String, time: Timeframe) -> QueryItem {
+    pub fn by_keyword_with_geo<S: Into<Cow<'a, str>>>(keyword: S, region: S, time: Timeframe) -> Self {
         QueryItem {
-            keyword,
-            geo: Some(region),
+            keyword: keyword.into(),
+            geo: Some(region.into()),
             time,
         }
+    }
+
+    pub fn keyword(&self) -> &str {
+        &self.keyword
     }
 }
 
@@ -159,6 +169,10 @@ pub struct Timeframe {
 }
 
 impl Timeframe {
+    pub fn new(start: Date<chrono::offset::Utc>, end: Date<chrono::offset::Utc>) -> Timeframe {
+        Timeframe { start, end }
+    }
+
     pub fn default() -> Timeframe {
         Timeframe {
             start: chrono::Utc.ymd(2014, 1, 1),
