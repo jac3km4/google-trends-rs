@@ -1,8 +1,9 @@
-use crate::*;
 use reqwest::header::HeaderValue;
 use reqwest::{Client, Method, Request, Response, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
+
+use crate::*;
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(untagged)]
